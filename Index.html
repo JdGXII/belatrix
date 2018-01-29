@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Ejercicio Belatrix</title>
+    <script src="Scripts/angular.js"></script>
+    <script src="Scripts/app.js"></script>
+    
+</head>
+<body>
+
+
+    <div ng-app="belatrix">
+        <div ng-controller="testCtrl">
+
+            <ul>
+                <li ng-repeat="ubigeo in ubigeos">
+                    Codigo:
+                    {{ubigeo.codigo}}<br />
+                    Nombre:
+                    {{ubigeo.nombre}} <br />
+                    Codigo Padre:
+                    {{ubigeo.provincia.codigo}}<br />
+                    Descripcion Padre:
+                    {{ubigeo.provincia.nombre}}<br />
+                    Abuelo:
+                    {{ubigeo.provincia.departamento.codigo}}
+
+                </li>
+            </ul>
+
+        </div>
+
+
+
+        <div ng-controller="MainCtrl" class="container">
+            <h1>Select text file</h1>
+            <input type="file" on-read-file="showContent($content)" />
+            <div ng-if="content">
+                <h2>File content is:</h2>
+                <pre>{{ content }}</pre>
+                <pre>{{ provincias }}</pre>
+                <pre>{{debug}}</pre>
+            </div>
+         
+        </div>
+
+    </div>
+   
+
+</body>
+</html>

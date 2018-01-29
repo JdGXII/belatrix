@@ -82,7 +82,7 @@ app.controller('MainCtrl', function ($scope) {
         distritos.shift();
         $scope.content = departamentos;
         $scope.provincias = provincias;
-        $scope.debug = distritos;
+        $scope.distritos = distritos;
     };
 });
 

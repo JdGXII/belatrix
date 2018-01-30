@@ -1,7 +1,7 @@
 # belatrix
 Repositorio con ejercicio tecnico para entrevista.
 
-La aplicacion recibe un archivo plano/texto con "ubigeos" (Departamento / Provincia / Distrito). Valida si el formato del archivo es correcta y retorna
+Aplicacion responsive y mobile-friendly que recibe un archivo plano/texto con "ubigeos" (Departamento / Provincia / Distrito). Valida si el formato del archivo es correcta y retorna
 tres arrays con objetos de JavaScript con dichos "ubigeos" dividos por "Departamento", "Provincia" y "Distrito" a la misma pagina donde se cargo el archivo.
 
 Ejemplo de formato del archivo plano/texto:

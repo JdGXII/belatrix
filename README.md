@@ -5,6 +5,7 @@ La aplicacion recibe un archivo plano/texto con "ubigeos" (Departamento / Provin
 tres arrays con objetos de JavaScript con dichos "ubigeos" dividos por "Departamento", "Provincia" y "Distrito" a la misma pagina donde se cargo el archivo.
 
 Ejemplo de formato del archivo plano/texto:
+
 “01 Lima /  / ”
 
 “01 Lima / 50 Lima / ”

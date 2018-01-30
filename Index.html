@@ -80,7 +80,7 @@
                     <div ng-controller="MainCtrl" class="container">
                         <h1>Cargue archivo con ubigeos</h1>
                         
-                        <input type="file" on-read-file="showContent($content)" />
+                        <input type="file" on-read-file="showContent($content)"/>
                         <div ng-if="content">
                             <a href="#departamentos" data-toggle="collapse">Departamentos</a>
                             <div id="departamentos" class="collapse">
@@ -130,6 +130,10 @@
                             </div>
                         </div>
 
+                        <div ng-if="formatoNoValido">
+                            <h2 style="color:red;">{{formatoNoValido}}</h2>
+                        </div>
+
 
 
                     </div>
@@ -147,7 +151,7 @@
 
 
     <div class="footer" style="margin-top:20px;">
-        <div class="row" style="background-color:#333; text-align:center; color:white;">Copyright © 2018 Belatrix Software. All rights reserved.</div>
+        <div class="row" style="background-color:#333; text-align:center; color:white;">Copyright © 2018 Jose Alzaibar. All rights reserved.</div>
     </div>
 </body>
 </html>

@@ -1,10 +1,6 @@
 ﻿var app = angular.module('belatrix', []);
 
-app.controller("myCtrl", function ($scope) {
-    $scope.firstName = "John";
-    $scope.lastName = "Doe";
-});
-
+//controller para pruebas iniciales, no es usado en producto final
 app.controller("testCtrl", function ($scope) {
 
     var departamento = {
@@ -18,81 +14,132 @@ app.controller("testCtrl", function ($scope) {
     $scope.ubigeos = distritos;
 });
 
+//como nombre lo indica, controlador principal
 app.controller('MainCtrl', function ($scope) {
     $scope.showContent = function (content) {
 
         //divide los contenidos del archivo en lineas y las coloca en un array
         var cont = content.split("\n");
-        var new_arr = [];
+    
         var departamentos = [];
         var provincias = [];
         var distritos = [];
-        var test = [];
-        //recorre el array de lineas
-        cont.forEach(function (element) {
+        
 
-            //proximas sentencias limpian los strings de caracteres secretos remanentes en la linea
-            element = element.replace("\"\r", "");
-            element = element.replace("\"", "");
-            element = element.replace('"',"");
-            
+        var primer_linea = limpiarLinea(cont[0]);
+        if (validarFormato(primer_linea)) {
 
-            var ubigeos = [];
-
-            //divide la linea actual que contiene los elementos como tales de los objetos a ser guardados
-            ubigeos = (element.split("/"));
+            //recorre el array de lineas
+            cont.forEach(function (element) {
 
 
-            //creacion de departamento. Por formato de documento los dptos siempre deberian estar en el indice 0
-            //remueve espacios en blanco al principio y final
-            var trim_dept = ubigeos[0].trim()
-            var departamento = crearObjeto(trim_dept.split(" "));
-            //revisa si el codigo de departamento es valido antes de insertar
-            if (departamento.codigo != -1) {
-                insertar(departamentos, departamento);
-            }
 
-            //creacion de provincia. Por formato de documento las provincias siempre deberian estar en el indice 1
-            //remueve los espacios blancos al principio y final del string que contiene la provincia    
-            var trim_prov = ubigeos[1].trim();
-            var provincia = crearObjeto(trim_prov.split(" "));
-            //revisa si el codigo de la provincia es valido
-            if (provincia.codigo != -1) {
-                provincia.departamento = departamento;
-                insertar(provincias, provincia);
-            }
+                element = limpiarLinea(element);
 
-            //creacion de distrito. Por formato de documento, las provincias siempre deberian estar en el indice 2
-            var trim_dist = ubigeos[2].trim();
-            var distrito = crearObjeto(trim_dist.split(" "));
-            //revisa si el codigo del distrito es valido
-            if (distrito.codigo != -1) {
-                distrito.provincia = provincia;
-                insertar(distritos, distrito);
-            }
 
-            
+                var ubigeos = [];
 
-            new_arr.push(trim_prov.split(" "));
-            test.push(element);
-        });
+                //divide la linea actual que contiene los elementos como tales de los objetos a ser guardados
+                ubigeos = (element.split("/"));
+
+
+                //creacion de departamento. Por formato de documento los dptos siempre deberian estar en el indice 0
+                //remueve espacios en blanco al principio y final
+                var trim_dept = ubigeos[0].trim()
+                var departamento = crearObjeto(trim_dept.split(" "));
+                //revisa si el codigo de departamento es valido antes de insertar
+                if (departamento.codigo != -1) {
+                    insertar(departamentos, departamento);
+                }
+
+                //creacion de provincia. Por formato de documento las provincias siempre deberian estar en el indice 1
+                //remueve los espacios blancos al principio y final del string que contiene la provincia    
+                var trim_prov = ubigeos[1].trim();
+                var provincia = crearObjeto(trim_prov.split(" "));
+                //revisa si el codigo de la provincia es valido
+                if (provincia.codigo != -1) {
+                    provincia.departamento = departamento;
+                    insertar(provincias, provincia);
+                }
+
+                //creacion de distrito. Por formato de documento, las provincias siempre deberian estar en el indice 2
+                var trim_dist = ubigeos[2].trim();
+                var distrito = crearObjeto(trim_dist.split(" "));
+                //revisa si el codigo del distrito es valido
+                if (distrito.codigo != -1) {
+                    distrito.provincia = provincia;
+                    insertar(distritos, distrito);
+                }
+
+
+
+             
+            });
+
+            delete $scope.formatoNoValido;
+            provincias.shift();
+            distritos.shift();
+
+            $scope.content = departamentos;
+            $scope.provincias = provincias;
+            $scope.distritos = distritos;
+        }
+        else {
+
+            delete $scope.content;
+            delete $scope.provincias;
+            delete $scope.distritos;
+            $scope.formatoNoValido = "Contenido del archivo no tiene un formato valido";
+        }
+
 
         
-        provincias.shift();
-        distritos.shift();
-        $scope.content = departamentos;
-        $scope.provincias = provincias;
-        $scope.distritos = distritos;
+
     };
 });
 
-function crearProvincia(arr, departamento) {
+//directive para cargar el archivo de texto y realizar las acciones del controlador principal
+app.directive('onReadFile', function ($parse) {
+    return {
+        restrict: 'A',
+        scope: {
+            onReadFile: "&"
+        },
+        link: function (scope, element, attrs) {
+            element.on('change', function (e) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    scope.$apply(function () {
+                        scope.onReadFile({ $content: e.target.result });
+                    });
+                };
+                reader.readAsText((e.srcElement || e.target).files[0]);
+            });
+        }
+    };
+});
 
-    if (arr[0] != " " || arr[1] != " ") {
+//verifica si el contenido del archivo tiene el formato que se espera
+//por limitaciones de tiempo solo revisa si la primera linea esta bien
+//usando matching con una regular expression
+function validarFormato(linea) {
 
-
-    }
+    var regex = new RegExp(/[0-9][0-9]+ \w+ \/  \//)
+    var valido = /[0-9][0-9]+ \w+ \/  \//.test(linea);
+    return valido;
 }
+
+//toma una linea del archivo y la limpia de caracteres especiales
+//retorna el elemento limpio
+function limpiarLinea(element) {
+    //proximas sentencias limpian los strings de caracteres secretos remanentes en la linea
+    element = element.replace("\"\r", "");
+    element = element.replace("\"", "");
+    element = element.replace('"', "");
+
+    return element;
+}
+
 
 //toma un array conteniendo las propiedades bases de los objetos ubigeos (codigo y nombre) y retorna un objeto estilo JSON con estas
 //revisa si las propiedades no estan vacias antes de asignar y retornar
@@ -140,23 +187,5 @@ function insertar(arr, elemento) {
     return arr;
     
 }
-app.directive('onReadFile', function ($parse) {
-    return {
-        restrict: 'A',
-        scope: {
-            onReadFile: "&"
-        },
-        link: function (scope, element, attrs) {
-            element.on('change', function (e) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    scope.$apply(function () {
-                        scope.onReadFile({ $content: e.target.result });
-                    });
-                };
-                reader.readAsText((e.srcElement || e.target).files[0]);
-            });
-        }
-    };
-});
+
 
